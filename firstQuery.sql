@@ -1,0 +1,67 @@
+USE master
+GO
+IF NOT EXISTS (
+   SELECT name
+   FROM sys.databases
+   WHERE name = N'Debate Competitions'
+)
+CREATE DATABASE [Debate Competitions]
+GO
+USE [Debate Competitions]
+CREATE TABLE Trainer 
+(	TrainerID INT PRIMARY KEY,
+	FirstName VARCHAR(30) DEFAULT 'TBA',
+	LastName VARCHAR(30) DEFAULT 'TBA',
+	YearsofExperience TINYINT NOT NULL,
+	Gender CHAR(1) CHECK(Gender='F' or Gender='M')
+)
+
+CREATE TABLE Debater 
+(	Debater_ID INT PRIMARY KEY,
+	FirstName VARCHAR(30) DEFAULT 'TBA',
+	LastName VARCHAR(30) DEFAULT 'TBA',
+	NumofCompetitions TINYINT NOT NULL,
+	Gender CHAR(1) CHECK(Gender='F' or Gender='M'),
+	Trainer_ID INT FOREIGN KEY REFERENCES Trainer(TrainerID)
+)
+
+CREATE TABLE Debate_Competition
+(
+	CompetitionID TINYINT PRIMARY KEY,
+	NumofRounds TINYINT DEFAULT 4,
+	NumofTeams TINYINT DEFAULT 24,
+	LocationName varchar(30) DEFAULT 'Bucharest'
+)
+
+CREATE TABLE C_A_Team_Member
+(
+	CompetitionID TINYINT FOREIGN KEY REFERENCES Debate_Competition(CompetitionID) ON UPDATE CASCADE ON DELETE NO ACTION,
+	TrainerID INT FOREIGN KEY REFERENCES Trainer(TrainerID) ON UPDATE CASCADE ON DELETE NO ACTION
+)
+
+CREATE TABLE Adjudicator
+(
+	CompetitionID TINYINT FOREIGN KEY REFERENCES Debate_Competition(CompetitionID) ON UPDATE CASCADE ON DELETE NO ACTION,
+	TrainerID INT FOREIGN KEY REFERENCES Trainer(TrainerID) ON UPDATE CASCADE ON DELETE NO ACTION
+)
+
+CREATE TABLE Debate_Motion
+(
+	MotionID INT IDENTITY PRIMARY KEY,
+	Motion_Name VARCHAR(255) NOT NULL,
+	Motion_Descriptrion VARCHAR(1005),
+);
+
+CREATE TABLE Debate_Round
+(
+	RoundNumber TINYINT DEFAULT 4,
+	CompetitionID TINYINT FOREIGN KEY REFERENCES Debate_Competition(CompetitionID) ON UPDATE CASCADE ON DELETE NO ACTION,
+	FK_Motion_ID INT UNIQUE FOREIGN KEY REFERENCES Debate_Motion(MotionID),
+	RoundID INT  Primary Key
+)
+
+CREATE TABLE Pairing
+(
+	RoundID INT FOREIGN KEY REFERENCES Debate_Round(RoundID) ON UPDATE CASCADE ON DELETE NO ACTION,
+	TrainerID INT FOREIGN KEY REFERENCES Trainer(TrainerID) ON UPDATE CASCADE ON DELETE NO ACTION
+)
